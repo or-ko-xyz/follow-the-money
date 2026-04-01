@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Follow the Money: Inside OpenAI's $122B Funding Round</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface-2: #1a1a24;
+    --border: #2a2a3a;
+    --text: #e8e8f0;
+    --text-muted: #8888a0;
+    --accent-nvidia: #76b900;
+    --accent-amazon: #ff9900;
+    --accent-softbank: #e60033;
+    --accent-openai: #10a37f;
+    --accent-blue: #4a90d9;
+    --accent-purple: #9060c0;
+    --glow-nvidia: rgba(118, 185, 0, 0.15);
+    --glow-amazon: rgba(255, 153, 0, 0.15);
+    --glow-openai: rgba(16, 163, 127, 0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Sora', sans-serif; line-height: 1.7; overflow-x: hidden; }
+  .noise { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 1000; }
+  .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -40%; left: -20%; width: 140%; height: 180%; background: radial-gradient(ellipse 600px 400px at 30% 40%, var(--glow-nvidia), transparent), radial-gradient(ellipse 500px 350px at 70% 60%, var(--glow-amazon), transparent), radial-gradient(ellipse 400px 300px at 50% 80%, var(--glow-openai), transparent); animation: drift 20s ease-in-out infinite alternate; }
+  @keyframes drift { 0% { transform: translate(0, 0) rotate(0deg); } 100% { transform: translate(-30px, 20px) rotate(2deg); } }
+  .hero-badge { position: relative; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-openai); border: 1px solid rgba(16, 163, 127, 0.3); padding: 0.5rem 1.5rem; border-radius: 100px; margin-bottom: 2.5rem; backdrop-filter: blur(10px); }
+  .hero h1 { position: relative; font-family: 'DM Serif Display', serif; font-size: clamp(2.8rem, 7vw, 5.5rem); line-height: 1.1; max-width: 900px; margin-bottom: 1.5rem; background: linear-gradient(135deg, #fff 0%, #c0c0d0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { position: relative; font-size: 1.1rem; color: var(--text-muted); max-width: 620px; font-weight: 300; margin-bottom: 3rem; }
+  .scroll-hint { position: relative; width: 24px; height: 40px; border: 2px solid var(--border); border-radius: 12px; display: flex; justify-content: center; }
+  .scroll-hint::after { content: ''; width: 3px; height: 8px; background: var(--text-muted); border-radius: 2px; margin-top: 6px; animation: scrollBounce 2s ease-in-out infinite; }
+  @keyframes scrollBounce { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(10px); opacity: 0.3; } }
+  section { padding: 6rem 2rem; max-width: 1100px; margin: 0 auto; }
+  .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+  .section-label::before { content: ''; width: 24px; height: 1px; background: var(--border); }
+  h2 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 1.5rem; line-height: 1.15; }
+  .lead { font-size: 1.05rem; color: var(--text-muted); font-weight: 300; max-width: 700px; margin-bottom: 3rem; }
+  .deal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 3rem 0; }
+  .deal-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; position: relative; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; }
+  .deal-card:hover { transform: translateY(-4px); }
+  .deal-card.nvidia { border-top: 3px solid var(--accent-nvidia); }
+  .deal-card.nvidia:hover { border-color: var(--accent-nvidia); }
+  .deal-card.amazon { border-top: 3px solid var(--accent-amazon); }
+  .deal-card.amazon:hover { border-color: var(--accent-amazon); }
+  .deal-card.softbank { border-top: 3px solid var(--accent-softbank); }
+  .deal-card.softbank:hover { border-color: var(--accent-softbank); }
+  .deal-card .company-name { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .deal-card.nvidia .company-name { color: var(--accent-nvidia); }
+  .deal-card.amazon .company-name { color: var(--accent-amazon); }
+  .deal-card.softbank .company-name { color: var(--accent-softbank); }
+  .deal-amount { font-family: 'DM Serif Display', serif; font-size: 2.8rem; margin-bottom: 0.5rem; }
+  .deal-detail { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+  .deal-detail strong { color: var(--text); }
+  .flow-section { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 3rem; margin: 4rem 0; }
+  .flow-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .flow-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2.5rem; }
+  .flow-diagram { display: flex; flex-direction: column; gap: 0.5rem; }
+  .flow-step { display: grid; grid-template-columns: 36px 1fr; gap: 1rem; align-items: start; padding: 1.2rem 0; border-bottom: 1px solid rgba(42, 42, 58, 0.5); }
+  .flow-step:last-child { border-bottom: none; }
+  .step-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-num.nvidia-step { background: rgba(118,185,0,0.15); color: var(--accent-nvidia); }
+  .step-num.amazon-step { background: rgba(255,153,0,0.15); color: var(--accent-amazon); }
+  .step-num.openai-step { background: rgba(16,163,127,0.15); color: var(--accent-openai); }
+  .step-num.return-step { background: rgba(74,144,217,0.15); color: var(--accent-blue); }
+  .step-content h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .step-content p { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+  .step-tag { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; padding: 0.2rem 0.6rem; border-radius: 4px; margin-top: 0.3rem; letter-spacing: 0.05em; }
+  .tag-balance { background: rgba(118,185,0,0.12); color: var(--accent-nvidia); }
+  .tag-income { background: rgba(255,153,0,0.12); color: var(--accent-amazon); }
+  .tag-revenue { background: rgba(16,163,127,0.12); color: var(--accent-openai); }
+  .tag-circular { background: rgba(74,144,217,0.12); color: var(--accent-blue); }
+  .financials { margin: 3rem 0; overflow-x: auto; }
+  .financials table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  .financials th { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); text-align: left; padding: 1rem; border-bottom: 2px solid var(--border); white-space: nowrap; }
+  .financials td { padding: 0.9rem 1rem; border-bottom: 1px solid rgba(42, 42, 58, 0.4); white-space: nowrap; }
+  .financials tr:hover td { background: rgba(255, 255, 255, 0.02); }
+  .financials .mono { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; }
+  .highlight-row td { background: rgba(16, 163, 127, 0.04); }
+  .quote-block { border-left: 3px solid var(--accent-blue); padding: 1.5rem 2rem; margin: 2.5rem 0; background: rgba(74, 144, 217, 0.05); border-radius: 0 12px 12px 0; }
+  .quote-block p { font-family: 'DM Serif Display', serif; font-size: 1.15rem; font-style: italic; line-height: 1.6; margin-bottom: 0.75rem; }
+  .quote-block cite { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.05em; font-style: normal; }
+  .verdict { background: linear-gradient(135deg, var(--surface) 0%, var(--surface-2) 100%); border: 1px solid var(--border); border-radius: 20px; padding: 3rem; margin: 4rem 0; }
+  .verdict-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .verdict-icon { width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 163, 127, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+  .verdict h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; }
+  .verdict-body { font-size: 0.92rem; color: var(--text-muted); line-height: 1.8; }
+  .verdict-body strong { color: var(--text); }
+  .check-list { list-style: none; margin: 1.5rem 0; }
+  .check-list li { padding: 0.5rem 0; padding-left: 1.8rem; position: relative; font-size: 0.9rem; color: var(--text-muted); }
+  .check-list li::before { content: '\2713'; position: absolute; left: 0; color: var(--accent-openai); font-weight: 700; }
+  .check-list li.cross::before { content: '\2717'; color: var(--accent-softbank); }
+  .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0; }
+  @media (max-width: 700px) { .comparison-grid { grid-template-columns: 1fr; } }
+  .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.8rem; }
+  .comp-card h4 { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1rem; }
+  .comp-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.7; }
+  .comp-card p strong { color: var(--text); }
+  .sources { margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border); }
+  .sources h3 { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .source-item { font-size: 0.78rem; color: var(--text-muted); padding: 0.4rem 0; border-bottom: 1px solid rgba(42, 42, 58, 0.3); display: flex; gap: 0.75rem; }
+  .source-num { font-family: 'JetBrains Mono', monospace; color: var(--accent-blue); flex-shrink: 0; font-size: 0.7rem; }
+  .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 3rem 0; }
+  .stat-box { text-align: center; padding: 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  .stat-box .stat-val { font-family: 'DM Serif Display', serif; font-size: 2.2rem; margin-bottom: 0.25rem; }
+  .stat-box .stat-label { font-size: 0.75rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.05em; }
+  .nvidia-color { color: var(--accent-nvidia); }
+  .amazon-color { color: var(--accent-amazon); }
+  .openai-color { color: var(--accent-openai); }
+  .softbank-color { color: var(--accent-softbank); }
+  .blue-color { color: var(--accent-blue); }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 3rem auto; max-width: 1100px; }
+  .pie-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2.5rem; margin: 3rem 0; align-items: start; }
+  .pie-card { text-align: center; }
+  .pie-card h4 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; margin-bottom: 0.5rem; }
+  .pie-card .pie-sub { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+  .pie-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem 1.2rem; margin-top: 1.2rem; }
+  .pie-legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); }
+  .pie-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .diagram-wrapper { margin: 3rem auto; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2.5rem 1.5rem; overflow-x: auto; display: flex; justify-content: center; }
+  .diagram-wrapper svg { max-width: 100%; height: auto; }
+  .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 2rem; }
+  .glossary-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem 1.4rem; }
+  .glossary-item .gl-name { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.15rem; }
+  .glossary-item .gl-role { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--accent-blue); letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+  .glossary-item .gl-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+  footer { text-align: center; padding: 4rem 2rem; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); }
+  @media (max-width: 600px) { section { padding: 4rem 1.25rem; } .flow-section { padding: 2rem 1.5rem; } .deal-grid { grid-template-columns: 1fr; } .stat-row { grid-template-columns: 1fr 1fr; } .pie-row { grid-template-columns: 1fr; } .glossary-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+
+<div class="hero">
+  <div class="hero-badge">Financial Deep Dive &mdash; April 2026</div>
+  <h1>Follow the Money</h1>
+  <p>OpenAI just closed the largest private funding round in history at $122 billion. Amazon, Nvidia, and SoftBank led. But where does all that money actually go?</p>
+  <div class="scroll-hint"></div>
+</div>
+
+<!-- 01: The Deal -->
+<section>
+  <div class="section-label">01 &mdash; The Deal</div>
+  <h2>$122 Billion in Committed Capital</h2>
+  <p class="lead">In February 2026, OpenAI announced a $110B funding round at a $730B pre-money valuation. By March 31, 2026, the round closed at $122B with an $852B post-money valuation &mdash; the largest private financing in history.</p>
+
+  <div class="deal-grid">
+    <div class="deal-card amazon">
+      <div class="company-name">Amazon</div>
+      <div class="deal-amount">$50B</div>
+      <div class="deal-detail">$15B invested immediately. An additional <strong>$35B contingent</strong> on OpenAI going public or achieving AGI. Also expanded an existing $38B cloud deal by <strong>$100B over 8 years</strong> on AWS.</div>
+    </div>
+    <div class="deal-card nvidia">
+      <div class="company-name">Nvidia</div>
+      <div class="deal-amount">$30B</div>
+      <div class="deal-detail">Primarily structured as <strong>compute capacity</strong>, not cash equity. OpenAI committed to 3GW inference + 2GW training on Nvidia's <strong>Vera Rubin</strong> systems. Nvidia CEO Huang said this is probably their last pre-IPO investment.</div>
+    </div>
+    <div class="deal-card softbank">
+      <div class="company-name">SoftBank</div>
+      <div class="deal-amount">$30B</div>
+      <div class="deal-detail">Structured in <strong>three $10B tranches</strong> arriving April, July, and October 2026. Co-led the expanded round alongside Andreessen Horowitz, D.E. Shaw Ventures, MGX, TPG, and T. Rowe Price.</div>
+    </div>
+  </div>
+
+  <!-- Pie Charts -->
+  <div class="pie-row">
+    <div class="pie-card">
+      <h4>$122B Round Breakdown</h4>
+      <div class="pie-sub">By investor commitment</div>
+      <svg width="260" height="260" viewBox="0 0 260 260">
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-amazon)" stroke-width="28" stroke-dasharray="232.5 333.9" stroke-dashoffset="0" transform="rotate(-90,130,130)" opacity="0.9"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-nvidia)" stroke-width="28" stroke-dasharray="139.2 427.3" stroke-dashoffset="-232.5" transform="rotate(-90,130,130)" opacity="0.9"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-softbank)" stroke-width="28" stroke-dasharray="139.2 427.3" stroke-dashoffset="-371.7" transform="rotate(-90,130,130)" opacity="0.9"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-blue)" stroke-width="28" stroke-dasharray="55.5 511" stroke-dashoffset="-510.9" transform="rotate(-90,130,130)" opacity="0.9"/>
+        <text x="130" y="125" text-anchor="middle" fill="var(--text)" font-family="'DM Serif Display',serif" font-size="22">$122B</text>
+        <text x="130" y="145" text-anchor="middle" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace" font-size="9">TOTAL ROUND</text>
+      </svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-amazon)"></div>Amazon $50B (41%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-nvidia)"></div>Nvidia $30B (25%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-softbank)"></div>SoftBank $30B (25%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-blue)"></div>Others $12B (10%)</div>
+      </div>
+    </div>
+    <div class="pie-card">
+      <h4>Amazon FY2025 Revenue Mix</h4>
+      <div class="pie-sub">$716.9B total &mdash; AWS is 18% of revenue but 57% of operating income</div>
+      <svg width="260" height="260" viewBox="0 0 260 260">
+        <circle cx="130" cy="130" r="90" fill="none" stroke="#cc7a00" stroke-width="28" stroke-dasharray="336.5 230" stroke-dashoffset="0" transform="rotate(-90,130,130)" opacity="0.7"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="#e6a640" stroke-width="28" stroke-dasharray="127.8 438.7" stroke-dashoffset="-336.5" transform="rotate(-90,130,130)" opacity="0.7"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-amazon)" stroke-width="28" stroke-dasharray="101.8 464.7" stroke-dashoffset="-464.3" transform="rotate(-90,130,130)" opacity="0.95"/>
+        <text x="130" y="125" text-anchor="middle" fill="var(--text)" font-family="'DM Serif Display',serif" font-size="22">$716.9B</text>
+        <text x="130" y="145" text-anchor="middle" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace" font-size="9">FY2025 REVENUE</text>
+      </svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#cc7a00"></div>N. America $426.3B (59%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#e6a640"></div>International $161.9B (23%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-amazon)"></div>AWS $128.7B (18%)</div>
+      </div>
+    </div>
+    <div class="pie-card">
+      <h4>Nvidia FY2025 Revenue</h4>
+      <div class="pie-sub">$130.5B total &mdash; Data Center dominates at ~88%</div>
+      <svg width="260" height="260" viewBox="0 0 260 260">
+        <circle cx="130" cy="130" r="90" fill="none" stroke="var(--accent-nvidia)" stroke-width="28" stroke-dasharray="497.6 68.9" stroke-dashoffset="0" transform="rotate(-90,130,130)" opacity="0.9"/>
+        <circle cx="130" cy="130" r="90" fill="none" stroke="#3d6000" stroke-width="28" stroke-dasharray="68.9 497.6" stroke-dashoffset="-497.6" transform="rotate(-90,130,130)" opacity="0.7"/>
+        <text x="130" y="125" text-anchor="middle" fill="var(--text)" font-family="'DM Serif Display',serif" font-size="22">$130.5B</text>
+        <text x="130" y="145" text-anchor="middle" fill="var(--text-muted)" font-family="'JetBrains Mono',monospace" font-size="9">FY2025 REVENUE</text>
+      </svg>
+      <div class="pie-legend">
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:var(--accent-nvidia)"></div>Data Center ~$115B (88%)</div>
+        <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#3d6000"></div>Other Segments ~$15.5B (12%)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-val openai-color">$852B</div><div class="stat-label">Post-money valuation</div></div>
+    <div class="stat-box"><div class="stat-val blue-color">900M+</div><div class="stat-label">Weekly active users</div></div>
+    <div class="stat-box"><div class="stat-val amazon-color">$25B</div><div class="stat-label">Annualized revenue (Feb 2026)</div></div>
+    <div class="stat-box"><div class="stat-val softbank-color">50M+</div><div class="stat-label">Paying subscribers</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 02: Follow the Money -->
+<section>
+  <div class="section-label">02 &mdash; Follow the Money</div>
+  <h2>The Circular Cash Flow</h2>
+  <p class="lead">A growing chorus of financial analysts have observed that OpenAI's two largest investors are also its two most critical infrastructure vendors. Here's how the money actually moves.</p>
+
+  <div class="flow-section">
+    <div class="flow-title">The Nvidia Loop</div>
+    <div class="flow-subtitle">Nvidia invests $30B &rarr; OpenAI spends it on Nvidia hardware &rarr; Nvidia books it as revenue</div>
+    <div class="flow-diagram">
+      <div class="flow-step"><div class="step-num nvidia-step">1</div><div class="step-content"><h4>Nvidia moves $30B off its balance sheet</h4><p>Nvidia invests $30B in OpenAI's funding round as a mix of cash and compute capacity commitments. As of Q1 FY2026 (May 2025), Nvidia held $31.4B in cash and marketable securities.</p><span class="step-tag tag-balance">Balance Sheet &rarr; Investment</span></div></div>
+      <div class="flow-step"><div class="step-num openai-step">2</div><div class="step-content"><h4>OpenAI commits to 5GW of Nvidia systems</h4><p>OpenAI secured 3GW of dedicated inference capacity and 2GW of training on Nvidia's upcoming Vera Rubin systems. Nvidia CEO Jensen Huang has said building 1GW of data center capacity costs ~$50B, of which ~$35B is Nvidia hardware.</p><span class="step-tag tag-revenue">OpenAI Cash &rarr; Nvidia Hardware</span></div></div>
+      <div class="flow-step"><div class="step-num return-step">3</div><div class="step-content"><h4>Nvidia records it as revenue</h4><p>NewStreet Research estimated that for every $10B Nvidia invests in OpenAI, it will see $35B in GPU purchases or lease payments &mdash; about 27% of its annual revenue. OpenAI's GPU spend flows back to Nvidia's income statement as data center revenue (FY2025: $130.5B total revenue).</p><span class="step-tag tag-circular">Investment &rarr; Revenue Loop</span></div></div>
+    </div>
+  </div>
+
+  <div class="flow-section">
+    <div class="flow-title">The Amazon Loop</div>
+    <div class="flow-subtitle">Amazon invests $50B &rarr; OpenAI commits $100B on AWS &rarr; Amazon books it as cloud revenue</div>
+    <div class="flow-diagram">
+      <div class="flow-step"><div class="step-num amazon-step">1</div><div class="step-content"><h4>Amazon invests $50B in OpenAI equity</h4><p>Starting with an initial $15B cash infusion. Amazon (FY2025: $716.9B total revenue, AWS: $128.7B) has the cash flow to support it &mdash; trailing twelve-month operating cash flow was $139.5B.</p><span class="step-tag tag-balance">Balance Sheet &rarr; Investment</span></div></div>
+      <div class="flow-step"><div class="step-num openai-step">2</div><div class="step-content"><h4>OpenAI commits $100B on AWS over 8 years</h4><p>This expands an existing $38B deal. OpenAI will consume 2GW of Trainium capacity (Amazon's custom AI chips). AWS becomes the exclusive third-party cloud distributor for OpenAI Frontier.</p><span class="step-tag tag-income">OpenAI Cash &rarr; AWS Revenue</span></div></div>
+      <div class="flow-step"><div class="step-num return-step">3</div><div class="step-content"><h4>Amazon gets back 2&times; its investment as revenue</h4><p>William Blair analysts estimated the $100B deal could add ~$17B/year in AWS revenue if spread evenly &mdash; roughly 11% of AWS's expected 2026 revenue. Amazon invested $50B to secure $100B in future cloud revenue.</p><span class="step-tag tag-circular">Investment &rarr; Revenue Loop</span></div></div>
+    </div>
+  </div>
+
+  <!-- IMPROVED SVG DIAGRAM -->
+  <div class="diagram-wrapper">
+    <svg width="820" height="560" viewBox="0 0 820 560" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="aG" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#76b900"/></marker>
+        <marker id="aO" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ff9900"/></marker>
+        <marker id="aT" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#10a37f"/></marker>
+        <marker id="aB" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#4a90d9"/></marker>
+        <marker id="aP" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#9060c0"/></marker>
+      </defs>
+
+      <!-- Nodes -->
+      <circle cx="140" cy="120" r="58" fill="rgba(118,185,0,0.08)" stroke="#76b900" stroke-width="2"/>
+      <text x="140" y="115" text-anchor="middle" fill="#76b900" font-family="Sora,sans-serif" font-size="14" font-weight="600">Nvidia</text>
+      <text x="140" y="135" text-anchor="middle" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="10">$130.5B Rev</text>
+
+      <circle cx="680" cy="120" r="58" fill="rgba(255,153,0,0.08)" stroke="#ff9900" stroke-width="2"/>
+      <text x="680" y="115" text-anchor="middle" fill="#ff9900" font-family="Sora,sans-serif" font-size="14" font-weight="600">Amazon</text>
+      <text x="680" y="135" text-anchor="middle" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="10">$716.9B Rev</text>
+
+      <circle cx="410" cy="280" r="70" fill="rgba(16,163,127,0.08)" stroke="#10a37f" stroke-width="2.5"/>
+      <text x="410" y="275" text-anchor="middle" fill="#10a37f" font-family="Sora,sans-serif" font-size="15" font-weight="600">OpenAI</text>
+      <text x="410" y="295" text-anchor="middle" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="10">$122B Round</text>
+
+      <circle cx="140" cy="460" r="50" fill="rgba(74,144,217,0.08)" stroke="#4a90d9" stroke-width="2"/>
+      <text x="140" y="455" text-anchor="middle" fill="#4a90d9" font-family="Sora,sans-serif" font-size="13" font-weight="600">CoreWeave</text>
+      <text x="140" y="475" text-anchor="middle" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="9">GPU Cloud</text>
+
+      <circle cx="680" cy="460" r="50" fill="rgba(144,96,192,0.08)" stroke="#9060c0" stroke-width="2"/>
+      <text x="680" y="455" text-anchor="middle" fill="#9060c0" font-family="Sora,sans-serif" font-size="13" font-weight="600">Microsoft</text>
+      <text x="680" y="475" text-anchor="middle" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="9">Azure + $13B+</text>
+
+      <!-- Nvidia -> OpenAI (invest, upper curve, dashed) -->
+      <path d="M195,148 C265,170 290,200 350,240" fill="none" stroke="#76b900" stroke-width="1.8" stroke-dasharray="7,4" marker-end="url(#aG)"/>
+      <rect x="210" y="162" width="100" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="260" y="176" text-anchor="middle" fill="#76b900" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">$30B invest</text>
+
+      <!-- OpenAI -> Nvidia (buy GPUs, lower curve, solid) -->
+      <path d="M345,250 C275,215 220,175 190,152" fill="none" stroke="#10a37f" stroke-width="1.8" marker-end="url(#aT)"/>
+      <rect x="195" y="210" width="135" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="262" y="224" text-anchor="middle" fill="#10a37f" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">5GW Vera Rubin</text>
+
+      <!-- Amazon -> OpenAI (invest, upper curve, dashed) -->
+      <path d="M625,148 C555,170 530,200 472,240" fill="none" stroke="#ff9900" stroke-width="1.8" stroke-dasharray="7,4" marker-end="url(#aO)"/>
+      <rect x="510" y="162" width="100" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="560" y="176" text-anchor="middle" fill="#ff9900" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">$50B invest</text>
+
+      <!-- OpenAI -> Amazon (AWS spend, lower curve, solid) -->
+      <path d="M475,250 C545,215 600,175 630,152" fill="none" stroke="#10a37f" stroke-width="1.8" marker-end="url(#aT)"/>
+      <rect x="488" y="207" width="140" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="558" y="221" text-anchor="middle" fill="#10a37f" font-family="'JetBrains Mono',monospace" font-size="10" font-weight="600">$100B AWS / 8yr</text>
+
+      <!-- Nvidia -> CoreWeave (dashed vertical) -->
+      <path d="M140,180 L140,408" fill="none" stroke="#76b900" stroke-width="1.3" stroke-dasharray="5,3" marker-end="url(#aG)"/>
+      <rect x="40" y="278" width="108" height="34" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="94" y="292" text-anchor="middle" fill="#76b900" font-family="'JetBrains Mono',monospace" font-size="9">$2B invest +</text>
+      <text x="94" y="306" text-anchor="middle" fill="#76b900" font-family="'JetBrains Mono',monospace" font-size="9">7% ownership</text>
+
+      <!-- CoreWeave -> OpenAI -->
+      <path d="M188,438 C260,400 310,360 360,325" fill="none" stroke="#4a90d9" stroke-width="1.3" marker-end="url(#aB)"/>
+      <rect x="210" y="372" width="140" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="280" y="386" text-anchor="middle" fill="#4a90d9" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">GPU cloud capacity</text>
+
+      <!-- OpenAI -> Microsoft -->
+      <path d="M465,320 C540,360 610,410 638,435" fill="none" stroke="#9060c0" stroke-width="1.3" marker-end="url(#aP)"/>
+      <rect x="498" y="378" width="140" height="20" rx="4" fill="#111118" opacity="0.92"/>
+      <text x="568" y="392" text-anchor="middle" fill="#9060c0" font-family="'JetBrains Mono',monospace" font-size="9" font-weight="600">Azure API (exclusive)</text>
+
+      <!-- CoreWeave annotation -->
+      <text x="47" y="370" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="8">CoreWeave buys</text>
+      <text x="47" y="382" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="8">250K+ Nvidia GPUs</text>
+
+      <!-- Legend -->
+      <rect x="278" y="512" width="264" height="36" rx="8" fill="#111118" stroke="#2a2a3a" stroke-width="1"/>
+      <line x1="293" y1="530" x2="323" y2="530" stroke="#76b900" stroke-width="1.8" stroke-dasharray="6,3"/>
+      <text x="328" y="534" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="8">= Investment</text>
+      <line x1="420" y1="530" x2="450" y2="530" stroke="#10a37f" stroke-width="1.8"/>
+      <text x="455" y="534" fill="#8888a0" font-family="'JetBrains Mono',monospace" font-size="8">= Spend / Revenue</text>
+    </svg>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 03: Financial Statements -->
+<section>
+  <div class="section-label">03 &mdash; The Financial Statements</div>
+  <h2>Checking the Numbers</h2>
+  <p class="lead">All figures sourced from SEC filings (8-K) and official earnings reports.</p>
+
+  <h3 style="font-family:'DM Serif Display',serif; font-size:1.3rem; margin-bottom:1rem;">Nvidia (NVDA) &mdash; Fiscal Year Ending January</h3>
+  <div class="financials"><table><thead><tr><th>Period</th><th>Revenue</th><th>Data Center Rev.</th><th>Net Income</th><th>Cash &amp; Securities</th></tr></thead><tbody>
+    <tr><td>FY2025 Full Year</td><td class="mono nvidia-color">$130.5B</td><td class="mono">~$115B+</td><td class="mono">$72.9B</td><td class="mono">&mdash;</td></tr>
+    <tr><td>Q4 FY2025 (Jan 2025)</td><td class="mono">$39.3B</td><td class="mono">$35.6B</td><td class="mono">$22.1B</td><td class="mono">&mdash;</td></tr>
+    <tr><td>Q1 FY2026 (Apr 2025)</td><td class="mono">$44.1B</td><td class="mono">$39.1B</td><td class="mono">&mdash;</td><td class="mono nvidia-color">$31.4B</td></tr>
+    <tr><td>Q2 FY2026 (Jul 2025)</td><td class="mono">$46.7B</td><td class="mono">$41.1B</td><td class="mono">&mdash;</td><td class="mono">&mdash;</td></tr>
+    <tr class="highlight-row"><td>Q3 FY2026 (Oct 2025)</td><td class="mono nvidia-color">$57.0B</td><td class="mono nvidia-color">$51.2B</td><td class="mono">&mdash;</td><td class="mono">&mdash;</td></tr>
+  </tbody></table></div>
+
+  <h3 style="font-family:'DM Serif Display',serif; font-size:1.3rem; margin:2rem 0 1rem;">Amazon (AMZN) &mdash; Calendar Year</h3>
+  <div class="financials"><table><thead><tr><th>Period</th><th>Total Revenue</th><th>AWS Revenue</th><th>AWS Op. Income</th><th>Operating Cash Flow (TTM)</th></tr></thead><tbody>
+    <tr class="highlight-row"><td>FY2025 Full Year</td><td class="mono amazon-color">$716.9B</td><td class="mono amazon-color">$128.7B</td><td class="mono">$45.6B</td><td class="mono">$139.5B</td></tr>
+    <tr><td>Q4 2025</td><td class="mono">$213.4B</td><td class="mono">$35.6B (+24% YoY)</td><td class="mono">&mdash;</td><td class="mono">&mdash;</td></tr>
+    <tr><td>Q3 2025</td><td class="mono">&mdash;</td><td class="mono">$33.0B (+20% YoY)</td><td class="mono">$11.4B</td><td class="mono">&mdash;</td></tr>
+    <tr><td>FY2026 CapEx Planned</td><td class="mono" colspan="4" style="color:var(--accent-amazon);">~$200B, predominantly for AWS and AI infrastructure</td></tr>
+  </tbody></table></div>
+
+  <h3 style="font-family:'DM Serif Display',serif; font-size:1.3rem; margin:2rem 0 1rem;">OpenAI (Private)</h3>
+  <div class="financials"><table><thead><tr><th>Metric</th><th>Figure</th><th>Source / Date</th></tr></thead><tbody>
+    <tr><td>Annualized Revenue (Feb 2026)</td><td class="mono openai-color">~$25B</td><td class="mono">The Information, Mar 2026</td></tr>
+    <tr><td>Monthly Revenue</td><td class="mono">$2B/month</td><td class="mono">OpenAI press release, Mar 2026</td></tr>
+    <tr><td>FY2025 Total Revenue</td><td class="mono">~$13.1B</td><td class="mono">Multiple reports</td></tr>
+    <tr><td>H1 2025 Loss</td><td class="mono softbank-color">&minus;$2.5B</td><td class="mono">Reported loss on $4.3B rev</td></tr>
+    <tr><td>Target Revenue (2030)</td><td class="mono">$280B</td><td class="mono">Internal projections via CNBC</td></tr>
+    <tr><td>Total Committed Infra Spend</td><td class="mono amazon-color">$600B+ by 2030</td><td class="mono">CNBC, Feb 2026</td></tr>
+  </tbody></table></div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 04: What Analysts Say -->
+<section>
+  <div class="section-label">04 &mdash; What the Analysts Say</div>
+  <h2>Circular Financing Under the Microscope</h2>
+  <p class="lead">The debate is fierce. Here are the key voices and their positions &mdash; drawn from public statements and published analysis.</p>
+
+  <div class="quote-block">
+    <p>&ldquo;Nvidia invests $100 billion in OpenAI, which then OpenAI turns back and gives it back to Nvidia.&rdquo;</p>
+    <cite>&mdash; Bryn Talkington, Managing Partner, Requisite Capital Management (CNBC, Sep 2025)</cite>
+  </div>
+  <div class="quote-block" style="border-left-color: var(--accent-nvidia);">
+    <p>Jensen Huang dismissed the circular narrative, calling critical media reports &ldquo;nonsense&rdquo; and stating Nvidia would invest &ldquo;a great deal of money&rdquo; in OpenAI.</p>
+    <cite>&mdash; Jensen Huang, Nvidia CEO (Press conference, Taipei, Feb 2026)</cite>
+  </div>
+  <div class="quote-block" style="border-left-color: var(--accent-softbank);">
+    <p>Seaport analyst Jay Goldberg, who holds a rare Sell rating on Nvidia, called the investment relationship &ldquo;very murky&rdquo; and compared Nvidia's backing to a parental loan on a mortgage.</p>
+    <cite>&mdash; Jay Goldberg, Seaport Global Securities (Yahoo Finance, Nov 2025)</cite>
+  </div>
+
+  <div class="comparison-grid">
+    <div class="comp-card"><h4>The Bull Case</h4><p><strong>Janus Henderson</strong> called the wave of AI deals a &ldquo;virtuous circle&rdquo; that aligns suppliers, builders, and customers to meet real demand. <strong>Bernstein's Stacy Rasgon</strong> said there may be no better use of Nvidia's cash. Unlike dot-com round-tripping, physical assets (GPUs, data centers) are being built. OpenAI's revenue is real: 900M+ weekly users, $2B/month revenue, 50M+ subscribers.</p></div>
+    <div class="comp-card"><h4>The Bear Case</h4><p><strong>Michael Burry</strong> tweeted spreadsheets analyzing cash loops. <strong>Jim Chanos</strong> maintains short positions citing historical vendor-finance collapses. <strong>Aswath Damodaran</strong> (NYU Stern) warns that stripping away compute commitments and conditional tranches leaves a much smaller cash injection than headlines suggest. The EU competition staff has flagged circular spending risks (Mar 2026).</p></div>
+  </div>
+  <div class="comparison-grid" style="margin-top:0;">
+    <div class="comp-card"><h4>The Dot-Com Parallel</h4><p>In the late 1990s, telecom equipment makers like <strong>Nortel, Lucent, and Cisco</strong> lent money to startups and telcos to buy their equipment. Before the 2001 bust, financing extended by Cisco and Nortel exceeded 10% of annual revenue. <strong>33&ndash;80% of vendor loan portfolios went uncollected</strong> as customers failed.</p></div>
+    <div class="comp-card"><h4>Key Difference</h4><p>Unlike dot-com revenue round-tripping (buying each other's ads), Nvidia and OpenAI are performing their <strong>core business functions</strong>: Nvidia sells chips, OpenAI needs chips. Revenue flows one direction (to Nvidia). But the <strong>scale is unprecedented</strong>: Nvidia's AI startup investments totaled ~$53B across 170 deals from 2020&ndash;2025.</p></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 05: Wider Web -->
+<section>
+  <div class="section-label">05 &mdash; The Wider Web</div>
+  <h2>It's Not Just Two Companies</h2>
+  <p class="lead">The circularity extends far beyond Nvidia and Amazon. The entire AI ecosystem is a web of interlocking investments and purchasing commitments.</p>
+  <div class="deal-grid">
+    <div class="deal-card" style="border-top: 3px solid #4a90d9;"><div class="company-name" style="color:#4a90d9;">CoreWeave</div><div class="deal-amount" style="font-size:2rem;">$22.4B</div><div class="deal-detail">OpenAI's committed spend on CoreWeave data center capacity through 2029. CoreWeave has purchased 250,000+ Nvidia GPUs (~$7.5B). Nvidia owns ~7% of CoreWeave and invested another $2B in January 2026. Nvidia also guaranteed to buy any unsold CoreWeave compute for 6 years.</div></div>
+    <div class="deal-card" style="border-top: 3px solid #9060c0;"><div class="company-name" style="color:#9060c0;">Microsoft</div><div class="deal-amount" style="font-size:2rem;">$13B+</div><div class="deal-detail">Microsoft's cumulative OpenAI investment. Azure remains the exclusive cloud provider for OpenAI's stateless APIs. Microsoft receives 20% of OpenAI's revenue under their partnership. Nvidia also invested $10B in Anthropic alongside Microsoft ($5B) in November 2025.</div></div>
+    <div class="deal-card" style="border-top: 3px solid #e06040;"><div class="company-name" style="color:#e06040;">AMD</div><div class="deal-amount" style="font-size:2rem;">160M shares</div><div class="deal-detail">AMD granted OpenAI warrants for up to 160M shares (~10% of AMD) in exchange for OpenAI deploying 6GW of AMD GPU hardware by 2030. Critics called this arrangement &ldquo;even more roundabout&rdquo; than the Nvidia deal because AMD is giving up equity while receiving only revenue.</div></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 06: Bottom Line -->
+<section>
+  <div class="section-label">06 &mdash; The Bottom Line</div>
+  <h2>So, Is the Circular Claim Valid?</h2>
+  <div class="verdict">
+    <div class="verdict-header"><div class="verdict-icon">&starf;</div><h3>Mostly True, With Important Nuance</h3></div>
+    <div class="verdict-body">
+      <p>The core claim &mdash; that Nvidia and Amazon invest cash that flows right back to them as revenue &mdash; is <strong>substantiated by financial analysts, SEC filings, and the deal structures themselves</strong>. Here's the breakdown:</p>
+      <ul class="check-list">
+        <li><strong>Amazon invests $50B &rarr; OpenAI commits $100B on AWS over 8 years.</strong> Amazon is effectively investing to secure 2&times; its investment back as guaranteed cloud revenue. William Blair estimated ~$17B/year in new AWS revenue.</li>
+        <li><strong>Nvidia invests $30B &rarr; OpenAI committed to 5GW of Nvidia Vera Rubin systems.</strong> NewStreet Research estimated every $10B invested yields $35B in GPU purchases. OpenAI's infrastructure spending is overwhelmingly on Nvidia hardware.</li>
+        <li><strong>Both companies are OpenAI's primary vendors.</strong> Amazon (via AWS) and Nvidia (via GPUs) are the two most critical infrastructure suppliers for OpenAI's business.</li>
+        <li><strong>The circularity is widely recognized.</strong> Fortune, Bloomberg, The Register, Noah Smith (Noahpinion), and multiple Wall Street analysts have documented these cash loops in detail.</li>
+      </ul>
+      <p style="margin-top:1.5rem;"><strong>The nuance:</strong></p>
+      <ul class="check-list">
+        <li class="cross"><strong>It's not pure round-tripping.</strong> Unlike dot-com-era ad swaps, actual physical assets are being built (GPUs, data centers). Revenue flows primarily one direction: to the hardware/cloud vendor.</li>
+        <li class="cross"><strong>Nvidia's $30B isn't entirely cash.</strong> Nvidia CEO Huang clarified the $100B figure was &ldquo;never a commitment&rdquo; &mdash; it was an &ldquo;invitation.&rdquo; Much of Nvidia's investment is structured as compute capacity, not pure cash equity.</li>
+        <li class="cross"><strong>Amazon's $35B of the $50B is contingent</strong> on OpenAI going public or achieving AGI. Only $15B is immediate.</li>
+        <li class="cross"><strong>OpenAI generates real revenue</strong> &mdash; $25B annualized as of February 2026 from 900M+ weekly users. This isn't a company with no customers propping up fake demand.</li>
+      </ul>
+      <p style="margin-top:1.5rem;">The economist Noah Smith framed it well: this is <strong>vendor financing, not round-tripping</strong>. The concern isn't that it's illegal or fraudulent &mdash; it's that it may indicate demand isn't as strong as the hype suggests, and the intertwined balance sheets amplify systemic risk if any link in the chain breaks.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- 07: Glossary -->
+<section>
+  <div class="section-label">07 &mdash; Glossary</div>
+  <h2>People &amp; Analysts Referenced</h2>
+  <p class="lead">Key individuals quoted or cited throughout this analysis, with their roles and relevance.</p>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="gl-name">Jensen Huang</div><div class="gl-role">CEO &amp; Founder, Nvidia</div><div class="gl-desc">Co-founded Nvidia in 1993. Leads the world's most valuable semiconductor company (~$5T market cap). Dismissed circular financing criticism as &ldquo;nonsense&rdquo; at a Taipei press conference in February 2026.</div></div>
+    <div class="glossary-item"><div class="gl-name">Sam Altman</div><div class="gl-role">CEO &amp; Co-founder, OpenAI</div><div class="gl-desc">Leads OpenAI, the company behind ChatGPT. Oversaw the $122B funding round and strategic partnerships with Amazon, Nvidia, and Microsoft. Previously president of Y Combinator.</div></div>
+    <div class="glossary-item"><div class="gl-name">Andy Jassy</div><div class="gl-role">CEO, Amazon</div><div class="gl-desc">Succeeded Jeff Bezos as Amazon CEO in 2021. Previously founded and ran AWS. Championed the $50B OpenAI investment and $100B cloud partnership expansion.</div></div>
+    <div class="glossary-item"><div class="gl-name">Bryn Talkington</div><div class="gl-role">Managing Partner, Requisite Capital Management</div><div class="gl-desc">Houston-based investment advisor and frequent CNBC contributor. Made the widely-cited observation that Nvidia's investment in OpenAI circles right back to Nvidia as revenue.</div></div>
+    <div class="glossary-item"><div class="gl-name">Jay Goldberg</div><div class="gl-role">Analyst, Seaport Global Securities</div><div class="gl-desc">Semiconductor analyst who holds a rare Sell rating on Nvidia. Compared Nvidia's backing of AI startups to a parent co-signing their child's mortgage. Modeled 3.5&times; chip revenue per investment dollar.</div></div>
+    <div class="glossary-item"><div class="gl-name">Stacy Rasgon</div><div class="gl-role">Senior Analyst, Bernstein</div><div class="gl-desc">Widely followed semiconductor analyst. Argued there may be no better use of Nvidia's cash than investing in its own ecosystem, while acknowledging the deals fuel investor unease.</div></div>
+    <div class="glossary-item"><div class="gl-name">Aswath Damodaran</div><div class="gl-role">Professor of Finance, NYU Stern</div><div class="gl-desc">Known as the &ldquo;Dean of Valuation.&rdquo; Warned that stripping away compute commitments and conditional tranches from OpenAI's round leaves a much smaller actual cash injection than headlines suggest.</div></div>
+    <div class="glossary-item"><div class="gl-name">Michael Burry</div><div class="gl-role">Founder, Scion Asset Management</div><div class="gl-desc">Famous for predicting the 2008 housing crisis (depicted in &ldquo;The Big Short&rdquo;). Posted spreadsheets on social media analyzing cash loops in AI deals after the CoreWeave announcement.</div></div>
+    <div class="glossary-item"><div class="gl-name">Jim Chanos</div><div class="gl-role">Short Seller &amp; Investor</div><div class="gl-desc">Legendary short seller known for identifying Enron's fraud. Maintains short positions in AI-adjacent companies, citing historical vendor-finance collapses as a cautionary parallel.</div></div>
+    <div class="glossary-item"><div class="gl-name">Noah Smith</div><div class="gl-role">Economist &amp; Writer, Noahpinion</div><div class="gl-desc">Former Bloomberg columnist and economics professor. Published an influential analysis arguing AI circular deals are vendor financing (not round-tripping) &mdash; a concerning but not fraudulent practice.</div></div>
+    <div class="glossary-item"><div class="gl-name">Tomasz Tunguz</div><div class="gl-role">VC Partner &amp; Analyst, Theory Ventures</div><div class="gl-desc">Published a detailed comparison of Nvidia's vendor financing to Lucent's telecom-era practices, mapping OpenAI's $1T+ infrastructure commitments through 2035.</div></div>
+    <div class="glossary-item"><div class="gl-name">Sarah Friar</div><div class="gl-role">CFO, OpenAI</div><div class="gl-desc">Former CEO of Nextdoor and CFO of Square. Confirmed in a CNBC interview that Nvidia's investment would be in cash and most would be used to lease Nvidia chips. Indicated annualized run rate surpassed $20B in January 2026.</div></div>
+  </div>
+</section>
+
+<!-- Sources -->
+<section>
+  <div class="sources">
+    <h3>Sources &amp; References</h3>
+    <div class="source-item"><span class="source-num">[1]</span><span>CNBC &mdash; &ldquo;OpenAI announces $110 billion funding round with backing from Amazon, Nvidia, SoftBank&rdquo; (Feb 27, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[2]</span><span>Bloomberg &mdash; &ldquo;OpenAI Valued at $852 Billion After Backing From Amazon, Nvidia, SoftBank&rdquo; (Mar 31, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[3]</span><span>TechCrunch &mdash; &ldquo;OpenAI, not yet public, raises $3B from retail investors in monster $122B fund raise&rdquo; (Mar 31, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[4]</span><span>Nvidia SEC 8-K Filings: Q4 FY2025, Q1 FY2026, Q2 FY2026, Q3 FY2026 &mdash; via SEC EDGAR</span></div>
+    <div class="source-item"><span class="source-num">[5]</span><span>Amazon SEC 8-K Filing: FY2025 Annual Results &mdash; via SEC EDGAR</span></div>
+    <div class="source-item"><span class="source-num">[6]</span><span>Fortune &mdash; &ldquo;Nvidia's $100 billion investment in OpenAI has analysts asking about circular financing&rdquo; (Sep 28, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[7]</span><span>Bloomberg Graphics &mdash; &ldquo;AI Circular Deals: How Microsoft, OpenAI and Nvidia Keep Paying Each Other&rdquo; (Mar 2026)</span></div>
+    <div class="source-item"><span class="source-num">[8]</span><span>Noah Smith / Noahpinion &mdash; &ldquo;Should we worry about AI's circular deals?&rdquo; (Oct 22, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[9]</span><span>Tomasz Tunguz &mdash; &ldquo;Circular Financing: Does Nvidia's $110B Bet Echo the Telecom Bubble?&rdquo; (Oct 3, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[10]</span><span>GeekWire &mdash; &ldquo;Amazon invests $50B in OpenAI, deepens AWS partnership with expanded $100B cloud deal&rdquo; (Feb 27, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[11]</span><span>CNBC &mdash; &ldquo;Nvidia CEO Huang says $30 billion OpenAI investment 'might be the last'&rdquo; (Mar 4, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[12]</span><span>Yahoo Finance / Bloomberg &mdash; &ldquo;Pledge to Invest $100 Billion in OpenAI Was 'Never a Commitment,' Says Nvidia's Huang&rdquo; (Feb 2, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[13]</span><span>The Register &mdash; &ldquo;AI's trillion dollar deal wheel bubbling around Nvidia, OpenAI&rdquo; (Nov 4, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[14]</span><span>Highline Wealth Partners &mdash; &ldquo;Circular Investing in the AI Ecosystem&rdquo; (2026)</span></div>
+    <div class="source-item"><span class="source-num">[15]</span><span>CNBC &mdash; &ldquo;How Amazon's massive stake in OpenAI could boost its AI and cloud businesses&rdquo; (Feb 27, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[16]</span><span>Nvidia Newsroom &mdash; &ldquo;OpenAI and NVIDIA Announce Strategic Partnership to Deploy 10GW of NVIDIA Systems&rdquo; (Sep 2025)</span></div>
+    <div class="source-item"><span class="source-num">[17]</span><span>AWS Blog &mdash; &ldquo;AWS and OpenAI announce multi-year strategic partnership&rdquo; (Nov 3, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[18]</span><span>Fast Company &mdash; &ldquo;$100B OpenAI investment shows Nvidia's enduring leverage in AI&rdquo; (Oct 22, 2025)</span></div>
+    <div class="source-item"><span class="source-num">[19]</span><span>AI CERTs News &mdash; &ldquo;AI Market Ethics: NVIDIA Circular Financing Under Scrutiny&rdquo; (Mar 2026)</span></div>
+    <div class="source-item"><span class="source-num">[20]</span><span>Techish Kenya &mdash; &ldquo;OpenAI, Nvidia, and Oracle: The $100 Billion 'Stall' Exposing AI's Circular Economy&rdquo; (Feb 3, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[21]</span><span>TechCrunch &mdash; &ldquo;Nvidia invests $2B to help debt-ridden CoreWeave add 5GW of AI compute&rdquo; (Jan 26, 2026)</span></div>
+    <div class="source-item"><span class="source-num">[22]</span><span>Yahoo Finance &mdash; &ldquo;Nvidia's $24B AI deal blitz has Wall Street asking questions about murky circular investments&rdquo; (Nov 19, 2025)</span></div>
+  </div>
+</section>
+
+<footer>
+  <p>Research compiled April 2026 from SEC filings, earnings reports, and published financial analysis.<br>
+  All figures from public sources. Not financial advice. Built for educational discussion.</p>
+</footer>
+
+</body>
+</html>
